@@ -1,0 +1,389 @@
+{
+  "name": "Research AI Agent (by Tair Kaldybayev))",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -112,
+        -48
+      ],
+      "id": "c2041a55-f381-42ef-8218-9ec5a44f65ba",
+      "name": "When chat message received",
+      "webhookId": "0f42b49d-949f-421b-8ac0-d8ee917f0cd7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an expert in Research. You are allowed to use Chat GPT 4.1 mini for creating best prompts to the perplexity Sonar Deep Research tool in order to achive comprehensive research on the topic or question user is asking you for. Also you can optimize final output later with gpt 4.1 mini as well. include citations in final article."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        0
+      ],
+      "id": "72449996-1033-4dba-8459-7c1992fde53f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "sonar-deep-research",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        336,
+        224
+      ],
+      "id": "2ba0dd00-c3ce-49d5-bcf3-579455b306b7",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "KZA2E6BuXdrBujVM",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        224
+      ],
+      "id": "34c61265-29fc-4475-89dc-d058dcff95be",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "uyB30Xx8u2BiH469",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Sonar Deep Research\n*Start chat and ask a question that you want to get a research on*\n",
+        "height": 336,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -208
+      ],
+      "id": "6a92402f-164d-42e3-a18d-de8fe793d4ff",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## AI Agent connection \n**gpt 4.1 mini** - that helps with creating prompts and optimizing structure \nand \n**Perplexity Sonar Deep Research tool** - that works directly with search engine to find relevant answers",
+        "height": 336,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -208
+      ],
+      "id": "45c011c0-08a5-4c63-9c55-68c8eec957cd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 192,
+        "width": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        192
+      ],
+      "id": "a95c8e2b-0db3-4b6a-b71d-2df7bbce4674",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        592,
+        -208
+      ],
+      "id": "7c6f1526-b2b7-4a6d-8c81-700b791d637c",
+      "name": "Create file from text"
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        -208
+      ],
+      "id": "bae7d941-1419-4df0-b609-1cbd5aab7e2f",
+      "name": "Send a document",
+      "webhookId": "6ab63d20-a427-46b8-bb07-aa118386bd98"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        -208
+      ],
+      "id": "99b9ee92-163c-46ba-bd19-31848e22a8b6",
+      "name": "Summarization Chain"
+    },
+    {
+      "parameters": {
+        "content": "### Idea for further implementation",
+        "height": 224,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -256
+      ],
+      "id": "c665c710-da35-4e62-bcbc-d30224b3c0b1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "1eba4027-cc4f-440d-acd4-4b15510ef55e",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "Gq5vOoFH7uiTSct7",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Мне кажется \nчто эту задачу можно выполнять более эффективно. Сейчас она занимает 3,5 минуты и стоит больше $1 в токенах за 1 запрос.",
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        96
+      ],
+      "id": "385e4fd6-d468-4c2e-8ade-cc16ee111f96",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Отзыв Таира после применения",
+        "height": 640,
+        "width": 896,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        688,
+        32
+      ],
+      "id": "2f8d3f22-cc9b-47dc-b2d0-1c07c11142b9",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## user input example №1:\n\n\"Please provide me with the tools (questionnaires and surveys) used over the past 5 years to study trust and threats among government employees in relation to artificial intelligence\"",
+        "height": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        976,
+        96
+      ],
+      "id": "2804d9c6-c073-4551-bd6e-456f01e9dbdc",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## output example:\n\nhttps://docs.google.com/document/d/15NK2_xyDVgrm5znQqFh8Vg2r_bTddST7EHwo9CyPRyE/edit?usp=sharing\n\ncost: >0.80 $",
+        "height": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        96
+      ],
+      "id": "d33c29c6-c6f1-4a1a-bc08-4d231cb2315d",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## user input example №2:\n\n\"how to become the \"n8n wizard\" and \"automation god\"?\""
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        976,
+        416
+      ],
+      "id": "3c30ae7f-0147-4268-acce-47976c4fb8a7",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## output example:\n\nhttps://docs.google.com/document/d/12999B6pKppMQIErkhVzo3HvMPnACKhlsKfZ9iA51Ons/edit?usp=sharing\n\ncost: >0.50 $",
+        "height": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        416
+      ],
+      "id": "b6121a6f-1323-4e8c-9595-a631a8988fa8",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "### Perplexity \nОчень удобный утсрумент для этой задачи, но очень дорогой, если сделать через *SerpAPI*, можно сэкономить, \n## НО ТОЛЬКО ЕСЛИ\nпостроить автоматизацию таким образом чтобы промптами создавались четкие запросы для гугла по ключевым словам а после источники обрабатывались ... AI моделью с целью подобрать релевантные по запросу пользователя. (ДОРАБОТАТЬ более дешевую версию и протестировать)\n\n",
+        "height": 384,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        272
+      ],
+      "id": "f9d0d9fd-a94e-403f-9230-7ed04efbc805",
+      "name": "Sticky Note10"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9b60a6f-814c-4e91-b7a8-9cd9309f3c30",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0ee138a8550c5c555872db640269ca08540e661e58f30cd2fd4d19b9c50506b"
+  },
+  "id": "Sa3e4fHlejAUiFj6",
+  "tags": [
+    {
+      "name": "works",
+      "id": "1klWWhLNLIxyJd4H",
+      "createdAt": "2025-07-25T06:08:04.220Z",
+      "updatedAt": "2025-07-25T06:08:04.220Z"
+    }
+  ]
+}

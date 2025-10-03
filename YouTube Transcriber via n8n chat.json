@@ -1,0 +1,396 @@
+{
+  "name": "YouTube Transcriber via n8n chat",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Give me a URL of a video from YouTube to start! 👍",
+        "options": {
+          "inputPlaceholder": "Insert a URL of a YouTube video.  💻",
+          "subtitle": "Have a great transcription!  📖",
+          "title": "Youtube Video Transcriber 🚀"
+        }
+      },
+      "id": "38591643-f07a-4976-8a15-05089c49f4f3",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -768,
+        400
+      ],
+      "webhookId": "70129cbe-1a05-495f-bd92-18d36c1bc260",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import re\n\ndef youtube_video_url_validatior(video_url) -> str:\n  try:\n    if not video_url:\n      return {\"text\": 'URL from the video is required.', \"is_valid\": False}\n    \n    video_url: str = re.sub(r\"\\s{2,}\", \" \", video_url.strip())\n    \n    if not video_url:\n      return {\"text\": 'URL from the video is required.', \"is_valid\": False}\n    \n    if len(video_url) < 25:\n      return {\"text\": 'URL is too short to be a valid YouTube URL.', \"is_valid\": False}\n    \n    # if not re.match(r'^[A-Za-z0-9:/._?&=-]+$', video_url):\n    #   return {\"text\": 'URL contains invalid characters.', \"is_valid\": False}\n    \n    is_valid: bool = False\n    \n    for pattern in [\n        r'^https?://(?:www\\.)?youtube\\.com/watch\\?v=[\\w-]{11}',\n        r'^https?://youtu\\.be/[\\w-]{11}',\n        r'^https?://(?:www\\.)?youtube\\.com/embed/[\\w-]{11}',\n        r'^https?://(?:www\\.)?youtube\\.com/v/[\\w-]{11}',\n    ]:\n        if re.match(pattern, video_url):\n          is_valid = True\n          \n          break\n    \n    if not is_valid:\n      return {\"text\": 'Invalid YouTube URL format.', \"is_valid\": False}\n      \n    video_url_id: str | None = re.search(r'(?:v=|youtu\\.be/|embed/|v/)([\\w-]{11})', video_url).group(1)\n    \n    if not video_url_id or not re.match(r'^[\\w-]{11}$', video_url_id):\n      return {\"text\": 'Invalid YouTube video ID.', \"is_valid\": False}\n    \n    return {\"text\": video_url, \"is_valid\": True}\n  except Exception as ex:\n    raise ex\n\nreturn youtube_video_url_validatior(_input.first().json.chatInput)"
+      },
+      "id": "ee5039f9-0d7c-4f90-a4e9-733e4ca0307a",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -384,
+        400
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "b8927a53-2755-4364-84b1-5340c5c31af5",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "da4e5b94-9564-41ac-9fbf-a49fe74d3723",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -64,
+        208
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.text }}",
+        "options": {}
+      },
+      "id": "4689db84-9952-4372-a379-9edf7cd12526",
+      "name": "Respond to Webhook - Chat Message",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        -64,
+        512
+      ],
+      "retryOnFail": true,
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "content": "## Entry Point\n\nThe workflow entry point is the  node chat message.",
+        "height": 420,
+        "width": 300,
+        "color": 5
+      },
+      "id": "9f165bf1-c9d7-4ded-a11a-bd6453f1b98c",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -864,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Validation - URL\n\nThis node ensures that only a valid youtube video url goes forward.",
+        "height": 420,
+        "width": 300,
+        "color": 3
+      },
+      "id": "2f5c4a8e-d7cd-4ba3-b075-8c76cfda0ee7",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Data Structuring\n\nHere is the core of the workflow, where structuring is done to get the right format to answer.\n\n**NOTE:**\n\n1. Users implementing this template must modify the language in the OpenAI prompt to suit their desired output.\n\n2. An OpenAI API key is essential and must be properly configured to support data structuring and processing.  ",
+        "height": 560,
+        "width": 460,
+        "color": 4
+      },
+      "id": "c3d8c6eb-4f5f-4e31-a49a-cecda5a7ca08",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        704,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Supadata\n\nSupadata is a powerful tool that converts YouTube video URLs into structured data via a simple API. It efficiently extracts transcriptions, making it ideal for AI training, data analysis, or text-based applications.\n\n**NOTE:**\n\n1. Users implementing this template must change the language in the query parameter to suit their needs. \n\n2. An API key is required and must be configured for the workflow to function properly.",
+        "height": 900,
+        "width": 460,
+        "color": 7
+      },
+      "id": "c5affff8-6227-4625-96ab-388e7ce5ca55",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        -32
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Description\n\nThis workflow simplifies access to YouTube video content converting into clear and concise transcriptions, ideal for users seeking practicality. It transcribes YouTube videos directly and returns the text, eliminating the need to watch the full video. \n\nThe need for this workflow arose from the demands of studying, where, amidst the fast-paced routine of daily life, reading transcribed content proved faster and more efficient for creating summaries than watching entire videos. Often, time constraints make it difficult to watch videos in full, and written text allows for quicker absorption of information. This solution provides a seamless way to access and review content from any YouTube video, regardless of the topic.",
+        "height": 300,
+        "width": 640
+      },
+      "id": "79e52798-2723-4763-ba5c-3737df1409ba",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1584,
+        272
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66270798-60eb-4ab8-8572-ab957474e260",
+              "name": "text",
+              "type": "string",
+              "value": "={{ $json.error }} - {{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4752dcbe-69a1-434f-865f-6bf65b8ec580",
+      "name": "Edit Fields - Respond to Chat Message 2",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        352,
+        640
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97e0c175-8060-43da-9761-5c25d660c7ed",
+              "name": "text",
+              "type": "string",
+              "value": "={{ $json.message.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a4cdcfea-7165-4931-aa97-a9166862c11d",
+      "name": "Edit Fields - Respond to Chat Message 3",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1248,
+        128
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66270798-60eb-4ab8-8572-ab957474e260",
+              "name": "text",
+              "type": "string",
+              "value": "=Something went wrong with the data structuring."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "11f951fb-ce8c-496a-9690-655d1f4949d3",
+      "name": "Edit Fields - Respond to Chat Message 4",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1248,
+        560
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "=https://api.supadata.ai/v1/youtube/transcript?url={{ $json.text }}&text=true&lang=pt",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "sd_127cd1485884dc3d2b2a5bb28024308d"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "ed4c37ff-d8a6-496f-a21c-57cbdac6b09e",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        352,
+        352
+      ],
+      "executeOnce": false,
+      "notesInFlow": false,
+      "retryOnFail": false,
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini-2024-07-18",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI-2024-07-18"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an expert in grammar corrections and textual structuring.\n\nCorrect the classification of the provided text, adding commas, periods, question marks and other symbols necessary for natural and consistent reading. Do not change any words, just adjust the punctuation according to the grammatical rules and context.\n\nOrganize your content using markdown, structuring it with titles, subtitles, lists or other protected elements to clearly highlight the topics and information captured. Leave it in eanglish and/or Russian and remember to always maintain the original formatting.\n\nTextual organization should always be a priority according to the content of the text, as well as the appropriate title, which must make sense.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "316ad154-e68a-4e27-9fa2-60381bbc4027",
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        800,
+        480
+      ],
+      "retryOnFail": true,
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "uyB30Xx8u2BiH469",
+          "name": "OpenAi account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook - Chat Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields - Respond to Chat Message 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields - Respond to Chat Message 3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields - Respond to Chat Message 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb67f31f-1d5a-45da-bce2-ebae849f7e17",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0ee138a8550c5c555872db640269ca08540e661e58f30cd2fd4d19b9c50506b"
+  },
+  "id": "DjDYrAqKNqa6sxap",
+  "tags": []
+}

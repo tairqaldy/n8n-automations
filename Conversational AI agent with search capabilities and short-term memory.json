@@ -1,0 +1,223 @@
+{
+  "name": "Conversational AI agent with search capabilities and short-term memory",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### The conversation history(last 20 messages) is stored in a buffer memory",
+        "height": 201,
+        "width": 300
+      },
+      "id": "ab0a436a-4fb6-4962-b88d-36fddced7612",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "d59adbf7-22a5-4845-ba86-3a7ced88e4a2",
+      "name": "Chat OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -128,
+        400
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "uyB30Xx8u2BiH469",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "6799215a-505a-40e7-955f-45889ff72550",
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "position": [
+        560,
+        448
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Tools which agent can use to accomplish the task",
+        "height": 185,
+        "width": 348
+      },
+      "id": "31a7702f-1f94-467c-ac2c-3a905a6b00c4",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Conversational agent will utilise available tools to answer the prompt. ",
+        "height": 211,
+        "width": 422
+      },
+      "id": "72ff94d3-7d83-4624-815e-ebe63a4d1cba",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 20
+      },
+      "id": "d71c1ab0-23b1-4567-94f0-19150b59c35c",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        144,
+        448
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3a84d1c3-6a8e-4b91-8d04-a605fa6a4c0a",
+      "name": "SerpAPI",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "position": [
+        448,
+        448
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "serpApi": {
+          "id": "Gq5vOoFH7uiTSct7",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9b781deb-1671-4a92-b945-d0245088b2d4",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        80,
+        80
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        80
+      ],
+      "id": "13c10c8a-d212-41ef-b42a-05d5a198062f",
+      "name": "When chat message received",
+      "webhookId": "c179031c-1eb4-4eff-8fbb-77c638e4b3d6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9a37ac6-3087-49cf-8a32-157c3662fc38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0ee138a8550c5c555872db640269ca08540e661e58f30cd2fd4d19b9c50506b"
+  },
+  "id": "DL1fK4E19NCslptk",
+  "tags": [
+    {
+      "name": "works",
+      "id": "1klWWhLNLIxyJd4H",
+      "createdAt": "2025-07-25T06:08:04.220Z",
+      "updatedAt": "2025-07-25T06:08:04.220Z"
+    },
+    {
+      "createdAt": "2025-07-24T17:18:12.275Z",
+      "updatedAt": "2025-07-24T17:18:12.275Z",
+      "id": "bZdMU9LxBCOK9t1j",
+      "name": "chatbot"
+    }
+  ]
+}
